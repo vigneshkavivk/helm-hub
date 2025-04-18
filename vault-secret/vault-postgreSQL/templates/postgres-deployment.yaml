@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: vault  # You can specify the source pods allowed to access PostgreSQL
+    ports:
+    - protocol: TCP
+      port: 5432
+  egress:
+  - to:
+    - podSelector: {}
+    ports:
+    - protocol: TCP
+      port: 5432
+  policyTypes:
+  - Ingress
+  - Egress
