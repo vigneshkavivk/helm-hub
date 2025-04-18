@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitlab-config
+data:
+  gitlab.rb: |
+    external_url 'http://gitlab.example.com'
+    gitlab_rails['db_host'] = '{{ .Values.postgresql.host }}'
+    gitlab_rails['db_port'] = {{ .Values.postgresql.port }}
+    gitlab_rails['db_database'] = '{{ .Values.postgresql.database }}'
+    gitlab_rails['db_username'] = '{{ .Values.postgresql.username }}'
+    gitlab_rails['db_password'] = "$(POSTGRES_PASSWORD)"

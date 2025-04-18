@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backup-reader
+  namespace: rds-git
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backup-reader
+  template:
+    metadata:
+      labels:
+        app: backup-reader
+    spec:
+      containers:
+        - name: backup-reader
+          image: alpine
+          command: ["/bin/sh", "-c", "sleep infinity"]
+          volumeMounts:
+            - name: gitlab-backup-volume
+              mountPath: /mnt/backup
+      volumes:
+        - name: gitlab-backup-volume
+          persistentVolumeClaim:
+            claimName: gitlab-backup-pvc

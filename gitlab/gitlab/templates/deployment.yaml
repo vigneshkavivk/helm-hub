@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: gitlab
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+        - name: gitlab
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: GITLAB_OMNIBUS_CONFIG
+              value: |
+                external_url 'http://gitlab.example.com';
+                gitlab_rails['db_host'] = '{{ .Values.postgresql.host }}';
+                gitlab_rails['db_port'] = {{ .Values.postgresql.port }};
+                gitlab_rails['db_database'] = '{{ .Values.postgresql.database }}';
+                gitlab_rails['db_username'] = '{{ .Values.postgresql.username }}';
+                gitlab_rails['db_password'] = "$(POSTGRES_PASSWORD)";
+          envFrom:
+            - secretRef:
+                name: {{ .Values.postgresql.existingSecret }}
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - mountPath: /var/opt/gitlab
+              name: gitlab-storage
+            - mountPath: /var/opt/gitlab/backups
+              name: gitlab-backup-volume
+      volumes:
+        - name: gitlab-storage
+          persistentVolumeClaim:
+            claimName: gitlab-pvc
+        - name: gitlab-backup-volume
+          persistentVolumeClaim:
+            claimName: gitlab-backup-pvc

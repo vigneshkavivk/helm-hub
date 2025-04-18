@@ -1,0 +1,6 @@
+apiVersion: v2
+name: gitlab
+description: A Helm chart for deploying GitLab without built-in PostgreSQL
+type: application
+version: 0.1.0
+appVersion: "17.7.7"
